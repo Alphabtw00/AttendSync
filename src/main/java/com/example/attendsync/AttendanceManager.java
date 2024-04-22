@@ -7,39 +7,41 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 
 public class AttendanceManager {
-    private HashMap<String, Boolean> attendanceData;
+    private HashMap<String, HashMap<String, Boolean>> attendanceData;
 
     public AttendanceManager() {
         attendanceData = new HashMap<>();
-        // Initialize attendance data from file
-        initializeDataFromFile();
+        this.initializeDataFromFile();
     }
 
-    private void initializeDataFromFile() {
-        // Initialize attendance data for 5 students
+    private void initializeDataFromFile() { //reads students name and add default absent to all of them
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("attendance_data.txt");
              BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2) {
-                    String studentID = parts[0];
-                    boolean present = Boolean.parseBoolean(parts[1]);
-                    attendanceData.put(studentID, present);
-                }
+                String studentName = line;
+                HashMap<String, Boolean> attendance = new HashMap<>();
+                // Initialize attendance for all days to false
+                attendance.put("Monday", false);
+                attendance.put("Tuesday", false);
+                attendance.put("Wednesday", false);
+                attendance.put("Thursday", false);
+                attendance.put("Friday", false);
+                attendanceData.put(studentName, attendance);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Getter method to retrieve attendance data
-    public HashMap<String, Boolean> getAttendanceData() {
+    public HashMap<String, HashMap<String, Boolean>> getAttendanceData() {
         return attendanceData;
     }
 
-    // Method to update attendance for a student
-    public void updateAttendance(String studentID, boolean present) {
-        attendanceData.put(studentID, present);
+    public void updateAttendance(String studentName, String dayOfWeek, boolean present) {
+        HashMap<String, Boolean> studentAttendance = attendanceData.get(studentName);
+        if (studentAttendance != null) {
+            studentAttendance.put(dayOfWeek, present);
+        }
     }
 }
